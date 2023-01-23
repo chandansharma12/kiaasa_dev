@@ -1,0 +1,178 @@
+@extends('layouts.default')
+@section('content')
+
+<?php echo CommonHelper::displayPageErrorMsg($error_message); ?>
+
+@if(empty($error_message))
+  
+    <?php $breadCrumbArray = array(array('name'=>'Dashboard','link'=>'dashboard'),array('name'=>'Page Description List')); ?>
+    <?php echo CommonHelper::pageSubHeader($breadCrumbArray,'Page Description List'); ?>
+
+    <?php $currency = CommonHelper::getCurrency(); ?>
+    <section class="product_area">
+        <div class="container-fluid" >
+            <form method="get">
+                <div class="row justify-content-end" >
+                    <div class="col-md-2" >
+                        <select name="page_name" id="page_name"  class="form-control" >
+                            <option value="">-- Page Type --</option>
+                            @for($i=0;$i<count($pages_name_list);$i++)
+                                <?php if($pages_name_list[$i]['page_name'] == request('page_name')) $sel = 'selected';else $sel = ''; ?>  
+                                <option value="{{$pages_name_list[$i]['page_name']}}" {{$sel}}>{{$pages_name_list[$i]['page_name']}}</option>
+                            @endfor    
+                        </select>
+                    </div>
+                    <div class="col-md-1" ><input type="submit" name="search" id="search" value="Search" class="btn btn-dialog" ></div>
+                    <div class="col-md-2" ><input type="button" name="addPageDescBtn" id="addPageDescBtn" value="Add Page Description" class="btn btn-dialog" onclick="addPageDescription();"></div>
+                </div>
+            </form>
+            
+            <div class="separator-10">&nbsp;</div>
+            <div id="orderContainer" class="table-container">
+                <div class="table-responsive table-filter">
+                    <table class="table table-striped admin-table" cellspacing="0" style="font-size:12px; ">
+                        <thead><tr class="header-tr">
+                                <th>ID</th>
+                                <th>Page</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Date Added</th>
+                                <th>Action</th>
+                            </tr></thead>
+                        <tbody>
+                            @for($i=0;$i<count($page_desc_list);$i++)
+                                <tr>
+                                    <td>{{$page_desc_list[$i]->id}}</td>
+                                    <td>{{$page_desc_list[$i]->page_name}}</td>
+                                    <td>{{$page_desc_list[$i]->desc_name}}</td>
+                                    <td>{{$page_desc_list[$i]->desc_detail}}</td>
+                                    <td>{{$page_desc_list[$i]->desc_type}}</td>
+                                    <td>{{date('d M Y',strtotime($page_desc_list[$i]->created_at))}}</td>
+                                    <td>
+                                        <a href="javascript:;" class="store-list-edit" onclick="editPageDescription({{$page_desc_list[$i]->id}});" title="Edit"><i title="Edit" class="far fa-edit"></i></a> &nbsp;
+                                    </td>
+                                </tr>
+                            @endfor
+                        </tbody>
+                    </table>
+
+                    {{ $page_desc_list->links() }} <p>Displaying {{$page_desc_list->count()}} of {{ $page_desc_list->total() }} records.</p>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade data-modal" id="desc_add_dialog" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true" >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Add Page Description</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><img src="{{asset('images/close.png')}}" alt="Close" title="Close" /></button>
+                </div>
+
+                <div class="alert alert-success alert-dismissible elem-hidden" id="addPageDescSuccessMessage"></div>
+                <div class="alert alert-danger alert-dismissible elem-hidden"  id="addPageDescErrorMessage"></div>
+
+                <form class="" name="addPageDescFrm" id="addPageDescFrm" type="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6" >
+                                <label>Page Name</label>
+                                <input id="page_name_add" type="text" class="form-control" name="page_name_add" value="" >
+                                <div class="invalid-feedback" id="error_validation_page_name_add"></div>
+                            </div>
+                            <div class="form-group col-md-6" >
+                                <label>Type</label>
+                                <select id="desc_type_add" class="form-control" name="desc_type_add"  >
+                                    <option value="">-- Type --</option>
+                                    <option value="column">Table Column</option>
+                                    <option value="filter">Filter</option>
+                                    <option value="page_description">Page Description</option>
+                                </select>    
+                                <div class="invalid-feedback" id="error_validation_desc_type_add"></div>
+                            </div>
+                        </div>    
+                        
+                        <div class="form-group" >
+                            <label>Name</label>
+                            <input id="desc_name_add" type="text" class="form-control" name="desc_name_add" value=""  >
+                            <div class="invalid-feedback" id="error_validation_desc_name_add"></div>
+                        </div>    
+
+                         <div class="form-group" >
+                            <label>Description</label>
+                            <textarea id="desc_detail_add" type="password"  name="desc_detail_add"  class="form-control"></textarea>
+                            <div class="invalid-feedback" id="error_validation_desc_detail_add"></div>
+                        </div>    
+                    </div>
+                    <div class="modal-footer center-footer">
+                        <button type="button" id="page_desc_add_cancel" name="page_desc_add_cancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" id ="page_desc_add_submit" name="page_desc_add_submit" class="btn btn-dialog" onclick="submitAddPageDescription();">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade data-modal" id="desc_edit_dialog" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-hidden="true" >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Edit Page Description</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><img src="{{asset('images/close.png')}}" alt="Close" title="Close" /></button>
+                </div>
+
+                <div class="alert alert-success alert-dismissible" id="editPageDescSuccessMessage"></div>
+                <div class="alert alert-danger alert-dismissible"  id="editPageDescErrorMessage"></div>
+
+                <form class="" name="editPageDescFrm" id="editPageDescFrm" type="POST">
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6" >
+                                <label>Page Name</label>
+                                <input id="page_name_edit" type="text" class="form-control" name="page_name_edit" value="" >
+                                <div class="invalid-feedback" id="error_validation_page_name_edit"></div>
+                            </div>
+                            <div class="form-group col-md-6" >
+                                <label>Type</label>
+                                <select id="desc_type_edit" class="form-control" name="desc_type_edit"  >
+                                    <option value="">-- Type --</option>
+                                    <option value="column">Table Column</option>
+                                    <option value="filter">Filter</option>
+                                    <option value="page_description">Page Description</option>
+                                </select>    
+                                <div class="invalid-feedback" id="error_validation_desc_type_edit"></div>
+                            </div>
+                        </div>    
+                        
+                        <div class="form-group" >
+                            <label>Name</label>
+                            <input id="desc_name_edit" type="text" class="form-control" name="desc_name_edit" value=""  >
+                            <div class="invalid-feedback" id="error_validation_desc_name_edit"></div>
+                        </div>    
+
+                         <div class="form-group" >
+                            <label>Description</label>
+                            <textarea id="desc_detail_edit" type="password"  name="desc_detail_edit" class="form-control"  ></textarea>
+                            <div class="invalid-feedback" id="error_validation_desc_detail_edit"></div>
+                        </div>    
+                    </div>
+                    <div class="modal-footer center-footer">
+                        <input type="hidden" name="desc_edit_id" id="desc_edit_id" value="">
+                        <button type="button" id="page_desc_edit_cancel" name="page_desc_edit_cancel" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" id ="page_desc_edit_submit" name="page_desc_edit_submit" class="btn btn-dialog" onclick="submitEditPageDescription();">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+@endif
+
+@endsection
+
+@section('scripts')
+<script src="{{ asset('js/pos_product.js') }}" ></script>
+@endsection

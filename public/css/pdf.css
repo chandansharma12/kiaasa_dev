@@ -1,0 +1,40 @@
+@page{ margin: 10px; }
+body{font-family: sans-serif;font-size: 11px;}
+.table-1{width:100%;border-collapse: collapse;font-size: 10px;}
+.table-1 td{vertical-align: top;}
+.border-top{border-top:1px solid #000;}
+.border-bottom{border-bottom:1px solid #000;}
+.border-right{border-right:1px solid #000;}
+.heading-1{font-size: 15px;text-decoration: underline;text-transform: uppercase;margin-top: 10px;margin-bottom: 5px;}
+.separator-10{margin-top:5px;margin-bottom: 5px;}
+.text-1{font-size: 11px;line-height: 1.5em;}
+.text-2{font-size: 10px;line-height: 1.6em;}
+.text-3{font-size: 12px;line-height: 1.6em;}
+.text-4{font-size: 10px;line-height: 1.6em;padding-top:2px;padding-bottom:2px;}
+.text-5{font-size: 12px;line-height: 1.6em;padding-top:1px;padding-bottom:1px;}
+.text-6{font-size: 11px;line-height: 1.6em;font-weight: 700;}
+.separator-row-1{height:50px;}
+.pull-right{text-align:right;}
+.pull-center{text-align:center;}
+.content-data-1 td{padding-top:3px;padding-bottom:3px;}
+.heading-2{font-size: 22px;text-transform: uppercase;padding-top: 5px;padding-bottom: 5px;}
+.table-2{border-collapse: collapse;font-size: 12px;}
+.dashed-tr-1 td{border-bottom: 1px dashed #000;}
+.dashed-tr-2 td{border-bottom: 2px dashed #000;}
+.heading-3 {font-size: 14px;text-transform: uppercase;font-weight: bold;}
+.heading-4 {font-size: 16px;text-transform: uppercase;font-weight: bold;padding-top:2px;padding-bottom:2px;}
+.heading-5 {font-size: 14px;text-transform: uppercase;font-weight: bold;padding-top:2px;padding-bottom:2px;}
+.heading-6 {font-size: 12px;text-transform: uppercase;font-weight: bold;}
+.content-tr-1 td{padding-top:3px;padding-bottom:3px;}
+.content-tr-2 td{padding-top:2px;padding-bottom:2px;}
+.content-tr-3 td{font-size:6px;}
+.border-top-tr td{border-top: 1px solid #000;}
+.border-bottom-tr td{border-bottom: 1px solid #000;}
+.heading-tr-1 td{font-weight:600;}
+.total-td{padding:2px 2px 2px 5px;}
+.s-no{padding-left: 3px;}
+.pos-items-table{border-collapse: collapse;font-size: 8px;}
+.pos-amount-table{border-collapse: collapse;font-size: 9px;}
+.text-pos-bill-1{font-size: 8px;}
+#table_gate_pass{font-size: 14px;border:1px solid #000;min-width: 600px;margin: auto;}
+#table_gate_pass td{padding:5px;text-align: left;}
