@@ -1346,7 +1346,7 @@ class CommonHelper
     
     public static function addPosCustomer($data){
         // $validateionRules = array('customer_phone_new'=>'required','customer_email'=>'nullable|email','customer_salutation'=>['required',Rule::in(['Mr', 'Mrs','Ms','Dr','Other'])],'customer_name'=>'required');
-        $validateionRules = array('customer_phone_new'=>'required','customer_email'=>'nullable|email','customer_name'=>'required');
+        $validateionRules = array('customer_phone_new'=>'required|digits:10|numeric','customer_email'=>'nullable|email','customer_name'=>'required');
         $attributes = array('customer_phone_new'=>'Customer Phone','customer_name'=>'Name');
         // $attributes = array('customer_phone_new'=>'Customer Phone','customer_salutation'=>'Salutation','customer_name'=>'Name');
 

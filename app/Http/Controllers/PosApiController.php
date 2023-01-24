@@ -1023,7 +1023,7 @@ class PosApiController extends Controller
             }
         
             // $validateionRules = array('phone_no'=>'Required|digits_between:10,12','email'=>'Required|email|max:200','salutation'=>'Required','name'=>'Required|max:200','password'=>'Required|min:8|max:50|regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$');
-            $validateionRules = array('phone_no'=>'Required|digits_between:10,12','email'=>'Required|email|max:200','name'=>'Required|max:200','password'=>'Required|min:8|max:50');
+            $validateionRules = array('phone_no'=>'Required|numeric|digits_between:10,12','email'=>'Required|email|max:200','name'=>'Required|max:200','password'=>'Required|min:8|max:50');
             $attributes = array();
             
             $validator = Validator::make($data,$validateionRules,array(),$attributes);
@@ -1643,14 +1643,13 @@ class PosApiController extends Controller
                 } else {
                     PosCustomerResetPassword::create($insertArray);
                 }
-                \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($token)); 
 
                 $otp = random_int(1000, 9999);
-                $text = 'We have received a request to reset the password for your KIAASA account. OTP to reset password is '.$otp.''; 
+                $text = 'Dear Customer, Forgot your password We have received a request to reset the password for your KIAASA account. OTP to reset password is '.$otp.''; 
                 $checkPhone = PosCustomerTempOtp ::where('phone',$pos_customer_info->phone)->first();
                 if($checkPhone)
                 {
-                    PosCustomerTempOtp::update([
+                    PosCustomerTempOtp::where('email',$request->email)->update([
                         'phone' => $pos_customer_info->phone,
                         'otp' => $otp
                     ]);
@@ -1661,6 +1660,7 @@ class PosApiController extends Controller
                     ]);
                 }
                 $response_data = CommonHelper::dynamic_otp_send($pos_customer_info->phone,$text);
+                // \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($token)); 
                 return response()->json(['httpStatus'=>200, 'dateTime'=>time(),'status' => 'success', 'message' => 'We have e-mailed your password reset link!']);
 
             }catch (\Exception $th) { 
@@ -1780,6 +1780,7 @@ class PosApiController extends Controller
                                         'pos_product_master.sale_price',
                                         'pos_product_images.image_name',
                                         'pos_product_images.image_type',
+                                        'pos_product_wishlist.store_id'
                                         )
                                     ->get(); 
             $result = [];
