@@ -1942,58 +1942,64 @@ class PosApiController extends Controller
     // testing shiprocket 
     public function customer_ship_rocket(Request $request)
     {
-        // $orderDetails = [
-        //     "order_id"=> "224-44491",
-        //     "order_date"=> "2022-11-26 11:11",
-        //     "pickup_location"=> "hq",
-        //     "channel_id"=> "",
-        //     "comment"=> "sdsd",
-        //     "billing_customer_name"=> "CUSTOMER 1",
-        //     "billing_last_name"=> "CUSTOMER LASTNAME",
-        //     "billing_address"=> "House 221B, Leaf Village",
-        //     "billing_address_2"=> "Near Hokage House",
-        //     "billing_city"=> "New Delhi",
-        //     "billing_pincode"=> "201002",
-        //     "billing_state"=> "Delhi",
-        //     "billing_country"=> "India",
-        //     "billing_email"=> "kiaasa.pr@gmail.com",
-        //     "billing_phone"=> "9897753786",
-        //     "shipping_is_billing"=> true,
-        //     "shipping_customer_name"=> "",
-        //     "shipping_last_name"=> "",
-        //     "shipping_address"=> "",
-        //     "shipping_address_2"=> "",
-        //     "shipping_city"=> "",
-        //     "shipping_pincode"=> "",
-        //     "shipping_country"=> "",
-        //     "shipping_state"=> "",
-        //     "shipping_email"=> "",
-        //     "shipping_phone"=> "",
-        //     "order_items"=> "2",
-        //         "name"=> "COD",
-        //         "sku"=> "Tshirt-Blue-32",
-        //         "units"=> 1,
-        //         "selling_price"=> "1139.80",
-        //         "discount"=> "",
-        //         "tax"=> "",
-        //         "hsn"=> 4435,
-        //     "payment_method"=> "Prepaid",
-        //     "shipping_charges"=> 0,
-        //     "giftwrap_charges"=>0,
-        //     "transaction_charges"=> 0,
-        //     "total_discount"=> 0,
-        //     "sub_total"=> 1139.80,
-        //     "length"=> 10,
-        //     "breadth"=> 15,
-        //     "height"=> 20,
-        //     "weight"=> 2.5,
-        // ];
+        // return $loginDetails =  Shiprocket::login([
+        //     'email' => 'chandan.sharma@kindlebit.com', 
+        //     'password' => 'Welcome2kb'
+        // ]);
+
+        $orderDetails = [
+            "order_id"=> "224-44491",
+            "order_date"=> "2022-11-26 11:11",
+            "pickup_location"=> "hq",
+            "channel_id"=> "",
+            "comment"=> "sdsd",
+            "billing_customer_name"=> "CUSTOMER 1",
+            "billing_last_name"=> "CUSTOMER LASTNAME",
+            "billing_address"=> "House 221B, Leaf Village",
+            "billing_address_2"=> "Near Hokage House",
+            "billing_city"=> "New Delhi",
+            "billing_pincode"=> "201002",
+            "billing_state"=> "Delhi",
+            "billing_country"=> "India",
+            "billing_email"=> "kiaasa.pr@gmail.com",
+            "billing_phone"=> "9897753786",
+            "shipping_is_billing"=> true,
+            "shipping_customer_name"=> "",
+            "shipping_last_name"=> "",
+            "shipping_address"=> "",
+            "shipping_address_2"=> "",
+            "shipping_city"=> "",
+            "shipping_pincode"=> "",
+            "shipping_country"=> "",
+            "shipping_state"=> "",
+            "shipping_email"=> "",
+            "shipping_phone"=> "",
+            "order_items"=> "2",
+                "name"=> "COD",
+                "sku"=> "Tshirt-Blue-32",
+                "units"=> 1,
+                "selling_price"=> "1139.80",
+                "discount"=> "",
+                "tax"=> "",
+                "hsn"=> 4435,
+            "payment_method"=> "Prepaid",
+            "shipping_charges"=> 0,
+            "giftwrap_charges"=>0,
+            "transaction_charges"=> 0,
+            "total_discount"=> 0,
+            "sub_total"=> 1139.80,
+            "length"=> 10,
+            "breadth"=> 15,
+            "height"=> 20,
+            "weight"=> 2.5,
+        ];
 
         // $token = Shiprocket::getToken();
         
-        // $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjczNTA2OTUxLCJleHAiOjE2NzQzNzA5NTEsIm5iZiI6MTY3MzUwNjk1MSwianRpIjoiQjhrVFRQZ2ZldUNKVWFGUiJ9.omNB9GB6woLjX8wttamhOTzHy_OUEaPRaDHoXfOGmp8';
-        // $response =  Shiprocket::order($token)->create($orderDetails);
+        // $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE0NTQwODUsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjc0NjMwMTgwLCJleHAiOjE2NzU0OTQxODAsIm5iZiI6MTY3NDYzMDE4MCwianRpIjoibTRESVFYOVdQdEVDVE5TWiJ9.1ZXa3Bau0FXwMlrNe-i7MUy70VyWdQ0s3cbq3AlR8_0';
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjc0NjMxMTk5LCJleHAiOjE2NzU0OTUxOTksIm5iZiI6MTY3NDYzMTE5OSwianRpIjoiM2NnajBTaUltN2RxZVRJcyJ9.aWBmhpB3CE7dPYt4ySH4EyksKuK0iz92WkOyQkoGp_k';
+        $response =  Shiprocket::order($token)->create($orderDetails);
 
-        // return $response;
+        return $response;
     }
 }
