@@ -3858,15 +3858,36 @@ class CommonHelper
         }
 
         // create wishlist 
-        $insertArray = [
-            'user_id' => $requestData['customer_id'],
-            'product_id' => $requestData['product_id'],
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ];
-        $posWishlist = PosProductWishlist::create($insertArray);
+        // $insertArray = [
+        //     'user_id' => $requestData['customer_id'],
+        //     'product_id' => $requestData['product_id'],
+        //     'created_at' => date('Y-m-d H:i:s'),
+        //     'updated_at' => date('Y-m-d H:i:s'),
+        // ];
+        //$posWishlist = PosProductWishlist::create($insertArray);
+        $posWishlist = new PosProductWishlist;
+        $posWishlist->user_id = $requestData['customer_id'];
+        $posWishlist->product_id = $requestData['product_id'];
+        $posWishlist->store_id = $requestData['store_id'];
+        $posWishlist->created_at = date('Y-m-d H:i:s');
+        $posWishlist->updated_at = date('Y-m-d H:i:s');
+        $posWishlist->save();
         
         return array('httpStatus'=>201, 'dateTime'=>time(), 'status'=>'success','message' => 'Wishlist added successfully!');
+    }
+
+    public static function getStoreReportInventoryType($store_data,$report_name){
+        $inventory_type = [];
+        
+        if(!empty($store_data) && !empty($report_name)){
+            $store_report_data = Store_report_types::where('store_id',$store_data->id)->where('report',$report_name)->where('is_deleted',0)->first();
+            if(!empty($store_report_data->report_type)){
+                $store_inv_types = ['real'=>[0],'fake'=>[1],'both'=>[0,1]];
+                $inventory_type = $store_inv_types[$store_report_data->report_type];
+            }
+        }
+        
+        return $inventory_type;
     }
 
     // dynamic send opt function 

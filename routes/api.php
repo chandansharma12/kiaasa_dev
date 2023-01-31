@@ -35,7 +35,7 @@ Route::group(['middleware' => ['pos_api']], function () {
     Route::get('pos/color/list', 'PosApiController@getColorList');
     Route::get('pos/state/list', 'PosApiController@getStateList');
     Route::get('pos/product/details/{productId}/{storeId}', 'PosApiController@getProductDetails');
-    Route::post('pos/customer/create', 'PosApiController@createPosCustomer');
+    Route::post('pos/customer/create', 'PosApiController@createPosCustomer');// register
     Route::post('pos/order/create', 'PosApiController@createPosOrder');
     Route::post('pos/customer/details', 'PosApiController@getPosCustomerDetails');
     Route::get('pos/order/list/{customerId}', 'PosApiController@getPosOrderList');
@@ -58,4 +58,11 @@ Route::group(['middleware' => ['pos_api']], function () {
     Route::post('pos/product/guest-customer-verify-otp', 'PosApiController@guest_customer_verify_otp');
 
     Route::get('pos/customer/test-shiprocket', 'PosApiController@customer_ship_rocket');
+
+     // Create billing address
+     Route::post('pos/customer/billing/address/create', 'PosApiController@createPosCustomerBillingAddress');
+    // Get all cities
+     Route::get('pos/customer/getCities/{id}','PosApiController@getCitiesPostalcode');
+
+
 });

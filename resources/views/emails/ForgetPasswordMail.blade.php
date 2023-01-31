@@ -670,8 +670,8 @@
                                                                                                     <div>
                                                                                                         <div class="sib_class_20_black_b"
                                                                                                             style="color: #000; font-family: Montserrat,arial,helvetica,sans-serif; font-size: 20px; font-weight: 700;">
-                                                                                                            Hello
-                                                                                                            {{params.customer_name}},
+                                                                                                            Hello,
+                                                                                                            Dev
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </td>
@@ -759,14 +759,15 @@
                                                                                  </div>
                                                                               </v:roundrect>
                                                                               <![endif]--> <!--[if !mso]><!-- -->
-                                                                                                    <a href="https://shop.kiaasa.com/"
+                                                                                                        <a href="{{env('FRONT_BASE_URl')}}{{$details['token']}}"
                                                                                                         class="r19-r default-button"
                                                                                                         target="_blank"
                                                                                                         data-btn="1"
                                                                                                         style="color: #3b3f44; font-family: Montserrat,arial,helvetica,sans-serif; font-size: 16px; font-style: normal; font-weight: normal; line-height: 1.15; text-decoration: none; border-style: solid; word-wrap: break-word; display: inline-block; -webkit-text-size-adjust: none; mso-hide: all; border-color: #75ebef; border-radius: 0px; border-width: 2px; height: 20px; padding-bottom: 12px; padding-left: 5px; padding-right: 5px; padding-top: 12px; width: 239px;">
                                                                                                         <div class="sib_class_18_black_sb"
                                                                                                             style="color: #000; font-family: Montserrat,arial,helvetica,sans-serif; font-size: 18px; font-weight: 600;">
-                                                                                                            Visit Kiaasa
+                                                                                                            Verify Email
+                                                                                                            <!-- Visit Kiaasa -->
                                                                                                         </div>
                                                                                                     </a>
                                                                                                     <!--<![endif]-->

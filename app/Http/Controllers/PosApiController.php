@@ -587,7 +587,7 @@ class PosApiController extends Controller
             ->orderBy('ppm.id')        
             ->paginate(20);        
             
-            return $products_list = json_decode(json_encode($products_list),true);
+            $products_list = json_decode(json_encode($products_list),true);
             
             if(!empty($products_list['data'])){
                      
@@ -610,7 +610,7 @@ class PosApiController extends Controller
                 $images_list_back = \DB::table('pos_product_images')->where('product_id','>=',min($product_ids))->where('product_id','<=',max($product_ids))
                 ->where('image_type','back')->where('is_deleted',0)->select('id','product_id','image_name','image_type')->get()->toArray();
                 $images_list_back = json_decode(json_encode($images_list_back),true);
-
+                
                 for($i=0;$i<count($design_lookup_items);$i++){
                     if(strtoupper($design_lookup_items[$i]['type']) == 'POS_PRODUCT_CATEGORY'){
                         $category_id_list[$design_lookup_items[$i]['id']] = $design_lookup_items[$i]['name'];
@@ -637,7 +637,7 @@ class PosApiController extends Controller
                 {
                     $images_id_list_back[$images_list_back[$i]['product_id']] = $images_list_back[$i];
                 }
-
+                
                 $product_skus = array_column($products_list['data'],'product_sku');
                 
                 // get product list and inventory count
@@ -683,9 +683,10 @@ class PosApiController extends Controller
                     if(isset($images_id_list[$product['product_id']])){
                         $products_list['data'][$i]['image_type'] = $images_id_list[$product['product_id']]['image_type'];
                         $products_list['data'][$i]['image_url'] = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$product['product_id'].'/'.trim($images_id_list[$product['product_id']]['image_name']);
-                        
+                    
                         $products_list['data'][$i]['image_type_back'] = $images_id_list_back[$product['product_id']]['image_type'];
                         $products_list['data'][$i]['image_url_back'] = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$product['product_id'].'/'.trim($images_id_list_back[$product['product_id']]['image_name']);
+
                     }else{
                         $products_list['data'][$i]['image_type'] = $products_list['data'][$i]['image_url'] = '';
                         $products_list['data'][$i]['image_type_back'] = $products_list['data'][$i]['image_url'] = '';
@@ -713,8 +714,10 @@ class PosApiController extends Controller
                         $products_list['data'][$i]['discount_percent'] = round($net_price_data['discount_percent'],3);
                         $products_list['data'][$i]['gst_inclusive'] = $net_price_data['gst_inclusive'];
                     }
+                    
                     unset($products_list['data'][$i]['peice_barcode']);
                     unset($products_list['data'][$i]['arnon_inventory']);
+                    
                 }
                 
                 $products_list['next_page_url'] = (!empty($products_list['next_page_url']))?$products_list['next_page_url'].$qs_str:$products_list['next_page_url'];
@@ -730,7 +733,6 @@ class PosApiController extends Controller
             return response(array('httpStatus'=>200,"dateTime"=>time(),'status' => 'fail','error_message'=>$e->getMessage().', '.$e->getLine(),'message'=>'Error in Processing Request'),200);
         }    
     }
-    
     function getCategoryList(Request $request){
         try{ 
             $data = $request->all();
@@ -1016,7 +1018,6 @@ class PosApiController extends Controller
     function createPosCustomer(Request $request){
         try{ 
             $data = $request->all();
-
             $content_type_header = $request->header('Content-Type');
             if(empty($content_type_header) || strtolower($content_type_header) != 'application/json' ){
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
@@ -1117,7 +1118,8 @@ class PosApiController extends Controller
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
             }
             
-            $validateionRules = array('email'=>'Required|email|max:200','password'=>'Required|min:8|max:50|regex:/^[A-Za-z0-9_]+$/','password_new'=>'Required|min:8|max:50|regex:/^[A-Za-z0-9_]+$/');
+            $validateionRules = array('email'=>'Required|email|max:200','Required|min:8|max:50|regex:^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8}$','password_new'=>'Required|min:8|max:15|regex:^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).$'
+        );
             $attributes = array('password_new'=>'New Password');
             
             $validator = Validator::make($data,$validateionRules,array(),$attributes);
@@ -1158,8 +1160,8 @@ class PosApiController extends Controller
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
             }
             
-            $validationRules = array('full_name'=>'Required|min:3|max:200','customer_id'=>'Required|integer','address'=>'Required|min:10|max:200','locality'=>'Required|min:2|max:200',
-            'city_name'=>'Required|min:3|max:200','postal_code'=>'Required|min:5|max:15','state_id'=>'Required|integer');
+            $validationRules = array('full_name'=>'Required|min:3|max:200','customer_id'=>'Required|integer','address'=>'Required|min:1|max:200','locality'=>'Required|min:1|max:200',
+            'city_name'=>'Required|min:3|max:200','postal_code'=>'Required|min:5|max:15','state_id'=>'Required|integer','phone_no'=> 'required|numeric|digits_between:10,12');
             $attributes = array('state_id'=>'State');
             
             $validator = Validator::make($data,$validationRules,array(),$attributes);
@@ -1174,7 +1176,7 @@ class PosApiController extends Controller
             }
             
             $address_params = array('customer_id'=>trim($data['customer_id']),'address'=>trim($data['address']),'city_name'=>trim($data['city_name']),
-            'postal_code'=>trim($data['postal_code']),'state_id'=>trim($data['state_id']),'full_name'=>trim($data['full_name']),'locality'=>trim($data['locality']));
+            'postal_code'=>trim($data['postal_code']),'state_id'=>trim($data['state_id']),'full_name'=>trim($data['full_name']),'locality'=>trim($data['locality']),'phone'=>$data['phone_no']);
             
             $address_params['is_deleted'] = 0;
             $address_exists = Pos_customer_address::where($address_params)->first();
@@ -1608,7 +1610,8 @@ class PosApiController extends Controller
 
     // pos customer forget password link send to customer
     public function posCustomerForgetPassword(Request $request)
-    {
+    { 
+       
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:pos_customer'
         ]);
@@ -1626,31 +1629,27 @@ class PosApiController extends Controller
                 $token = Str::random(64);
                 
                 // token save and update in database 
-                $checkEmailId = PosCustomerResetPassword :: Where('email',$request->email)->first();
+                $checkEmailId = PosCustomerResetPassword:: where('email',$request->email)->first();
                 $insertArray = [
                     'email' => $request->email,
-                    'token' => $token,
-                    'created_at' => date('d-m-Y H:i:s'),
-                    'updated_at' => date('d-m-Y H:i:s')
+                    'token' => $token
                 ];
                 if($checkEmailId)
                 {
                     PosCustomerResetPassword :: Where('email',$request->email)->update([
                         'email' => $request->email,
-                        'token' => $token,
-                        'updated_at' => date('d-m-Y H:i:s')
+                        'token' => $token
                     ]);
                 } else {
                     PosCustomerResetPassword::create($insertArray);
                 }
-                \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($token)); 
-
                 $otp = random_int(1000, 9999);
-                $text = 'We have received a request to reset the password for your KIAASA account. OTP to reset password is '.$otp.''; 
+                $text = 'Dear Customer, Forgot your password We have received a request to reset the password for your KIAASA account. OTP to reset password is '.$otp.''; 
                 $checkPhone = PosCustomerTempOtp ::where('phone',$pos_customer_info->phone)->first();
+                
                 if($checkPhone)
                 {
-                    PosCustomerTempOtp::update([
+                    PosCustomerTempOtp::where('phone',$pos_customer_info->phone)->update([
                         'phone' => $pos_customer_info->phone,
                         'otp' => $otp
                     ]);
@@ -1660,6 +1659,12 @@ class PosApiController extends Controller
                         'otp' => $otp
                     ]);
                 }
+               
+                $details = [
+                    'name' => 'Test',
+                    'token' => $token
+                ];
+                \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($details)); 
                 $response_data = CommonHelper::dynamic_otp_send($pos_customer_info->phone,$text);
                 return response()->json(['httpStatus'=>200, 'dateTime'=>time(),'status' => 'success', 'message' => 'We have e-mailed your password reset link!']);
 
@@ -1674,8 +1679,9 @@ class PosApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:pos_customer',
-            'token' => 'required|token',
-            'password' => 'required|password'
+            'token' => 'required',
+            'password' => 'required',
+            'otp' => 'required|numeric|digits_between:4,4'
         ]);
 
         if($validator->fails())
@@ -1684,15 +1690,21 @@ class PosApiController extends Controller
         } else {
             try {
                 // check token exists
-                if(!empty($request->token))
+                $tokenCheck = PosCustomerResetPassword::where('token',$request->token)->first();
+                if(empty($tokenCheck))
                 {
-                    $tokenCheck = PosCustomerResetPassword::where('token',$request->token)->first();
-                    if(empty($tokenCheck))
+                    return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Token is incorrect', 'errors' => 'Token is incorrect');
+                }
+                // check otp exist
+                if(!empty($request->otp))
+                {
+                    $otpCheck = PosCustomerTempOtp::where('otp',$request->otp)->first();
+                    if(empty($otpCheck))
                     {
-                        return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Token is incorrect', 'errors' => 'Token is incorrect');
+                        return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'OTP is incorrect', 'errors' => 'OTP is incorrect');
                     }
                 }
-
+               
                 // check token expire time 
                 $diffTime = strtotime("now") - strtotime($tokenCheck->updated_at); 
                 // 300 secends 
@@ -1706,6 +1718,7 @@ class PosApiController extends Controller
                             'password' => Hash::make($request->password),
                             'updated_at' => date('d-m-Y H:i:s')
                         ]);
+                        
                         return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'success', 'message'=>'Password created successfully!');
                     } else {
                         return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Something is wrong, Please try again!', 'errors' => 'Email id does not exists!');
@@ -1714,7 +1727,7 @@ class PosApiController extends Controller
                     return array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Something is wrong, Please try again!', 'errors' => 'Token is expire!');
                 }
             } catch (\Exception $th) {
-                return response()->json(['status' => 'fail', 'error_message' => $th->getMessage()], 400);
+                return response()->json(['status' => 'fail', 'error_message' => $th->getMessage(), $th->getLine()], 400);
             }
         }
     }
@@ -1729,7 +1742,7 @@ class PosApiController extends Controller
             if(empty($content_type_header) || strtolower($content_type_header) != 'application/json' ){
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
             }
-            $validateionRules = ['product_id'=> 'required|numeric|min:1|not_in:0','customer_id'=>'required|numeric|min:1|not_in:0'];
+            $validateionRules = ['product_id'=> 'required|numeric|min:1|not_in:0','store_id'=>'required|numeric|not_in:0','customer_id'=>'required|numeric|min:1|not_in:0'];
             $attributes = array();
             
             $validator = Validator::make($data,$validateionRules,array(),$attributes);
@@ -1738,7 +1751,7 @@ class PosApiController extends Controller
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Validation Error', 'errors' => $validator->errors()));
             } 
             
-            $reqData = ['product_id'=>trim($data['product_id']),'customer_id' => trim($data['customer_id'])];
+            $reqData = ['product_id'=>trim($data['product_id']),'store_id'=>trim($data['store_id']),'customer_id' => trim($data['customer_id'])];
               
             $response_data = CommonHelper::add_pos_product_wish_list($reqData);
             return response($response_data,$response_data['httpStatus']);
@@ -1753,6 +1766,7 @@ class PosApiController extends Controller
     public function get_customer_product_wishlist(Request $request,$customerId)
     {
         try {
+            $data = $request->all();
             $content_type_header = $request->header('Content-Type');
             if(empty($content_type_header) || strtolower($content_type_header) != 'application/json' )
             {
@@ -1774,6 +1788,7 @@ class PosApiController extends Controller
                                     ->select(
                                         'pos_product_wishlist.id', 
                                         'pos_product_master.id as product_id', 
+                                        'pos_product_wishlist.store_id', 
                                         'pos_product_master.product_name', 
                                         'pos_product_master.product_description',
                                         'pos_product_master.base_price',
@@ -1782,6 +1797,67 @@ class PosApiController extends Controller
                                         'pos_product_images.image_type',
                                         )
                                     ->get(); 
+
+             // Get Ecommerce enabled vendors list start
+             $vendor_list = \DB::table('vendor_detail as v')
+             ->where('v.ecommerce_status',1)        
+             ->where('v.is_deleted',0)
+             ->select('v.id')        
+             ->get()->toArray();   
+             
+             $vendor_ids = array_column($vendor_list,'id');
+             $vendor_ids[] = 0;
+             $vendor_ids_str = implode(',',$vendor_ids);
+            
+            $products_list = \DB::table('pos_product_master_inventory as ppmi')
+            ->join('pos_product_master as ppm','ppm.id', '=', 'ppmi.product_master_id')
+            ->join('store as s','s.id', '=', 'ppmi.store_id')        
+            ->join('pos_product_images as ppi','ppm.id', '=', 'ppi.product_id')       
+            ->join('design_lookup_items_master as dlim1','dlim1.id', '=', 'ppm.category_id')       
+            ->join('production_size_counts as psc','psc.id', '=', 'ppm.size_id')               
+            ->where('ppmi.product_status',4)        
+            ->whereRaw("(ppmi.vendor_id IN (".$vendor_ids_str.") OR ppmi.vendor_id IS NULL)")        
+            ->where('ppmi.is_deleted',0)   
+            ->where('ppm.is_deleted',0)        
+            ->where('ppi.is_deleted',0)     
+            ->where('dlim1.is_deleted',0)       
+            ->where('psc.is_deleted',0)             
+            ->where('ppmi.status',1)             
+            ->where('s.ecommerce_status',1)           
+            ->where('dlim1.api_data',1)        
+            ->where('ppmi.fake_inventory',0)
+            ->where('ppm.fake_inventory',0); 
+            if(($data['store_id']) && !empty($data['store_id'])){
+                $store_id = trim($data['store_id']);
+                if(!is_numeric($store_id)){
+                    $store_data = Store::where('slug',$store_id)->first();
+                    $store_id = !empty($store_data)?$store_data->id:0;
+                }
+                
+                $products_list = $products_list->whereRaw("(ppmi.store_id = '$store_id')");
+                //$qs_str.='&store_id='.$data['store_id'];
+            }
+            // group by sku for sku as one product
+            $products_list = $products_list->groupBy('ppm.product_sku')
+            ->select('ppm.id as product_id','ppmi.store_id','ppmi.sale_price','ppmi.peice_barcode','ppm.product_name','ppm.product_sku','ppm.category_id','ppm.subcategory_id','ppm.product_barcode',
+            'ppm.product_description','ppm.season_id','ppm.hsn_code','ppm.gst_inclusive','ppmi.arnon_inventory',\DB::raw('count(ppmi.id) as inventory_count'))        
+            ->orderBy('ppm.id')        
+            ->paginate(20); 
+
+            $products_list = json_decode(json_encode($products_list),true);
+            for($i=0;$i<count($products_list['data']);$i++)
+            {
+                $product = $products_list['data'][$i]; 
+                //$products_list['data'][$i]['size_data'] = $size_list;      
+            
+            $products_list = json_decode(json_encode($products_list),true);
+
+            $product_data = ['store_id'=>$store_id,'sku'=>$products_list['data'][$i]['product_sku'],'category_id'=>$products_list['data'][$i]['category_id'],
+            'season'=>$products_list['data'][$i]['season_id'],'hsn_code'=>$products_list['data'][$i]['hsn_code'],'gst_inclusive'=>$products_list['data'][$i]['gst_inclusive'],
+            'peice_barcode'=>$products_list['data'][$i]['peice_barcode'],'arnon_inventory'=>$products_list['data'][$i]['arnon_inventory'],'sale_price'=>$products_list['data'][$i]['sale_price']];
+            $net_price_data = CommonHelper::getProductNetPriceData($product_data,$store_data);
+            // $products_list['data'][$i]['net_price'] = round($net_price_data['net_price'],3);
+            }
             $result = [];
             if(count($posWishlist) == 0)
             {
@@ -1796,15 +1872,17 @@ class PosApiController extends Controller
                         if($data[$value->id]->image_type=='front'){
                             $data[$value->id]->image_url_front = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$value->product_id.'/'.trim($data[$value->id]->image_name);
                             $data[$value->id]->image_url_back = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$value->product_id.'/'.trim($value->image_name);
+                            $data[$value->id]->net_price = round($net_price_data['net_price'],3);
                         }
                         
                         elseif($data[$value->id]->image_type=='back'){
                             $data[$value->id]->image_url_front = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$value->product_id.'/'.trim($value->image_name);
                             $data[$value->id]->image_url_back = str_replace('index.php','',url('/')).'/images/pos_product_images/'.$value->product_id.'/'.trim($data[$value->id]->image_name);
+                            $data[$value->id]->net_price = round($net_price_data['net_price'],3);
                         }
                     }
                 }
-
+              
                 foreach ($data as $value) 
                 {
                     $result[] = $value;
@@ -1813,7 +1891,7 @@ class PosApiController extends Controller
             }
         
         } catch (\Throwable $th) {
-            return response()->json(['status' => 'fail', 'error_message' => $th->getMessage()], 400);
+            return response()->json(['status' => 'fail', 'error_message' => $th->getMessage(), $th->getLine()], 400);
         }
     }
 
@@ -1826,23 +1904,23 @@ class PosApiController extends Controller
             {
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
             }
-            $validateionRules = ['product_id'=> 'required|numeric|min:1|not_in:0','customer_id'=>'required|numeric|min:1|not_in:0'];
+            $validateionRules = ['id'=> 'required|numeric|min:1|not_in:0','customer_id'=>'required|numeric|min:1|not_in:0'];
             $attributes = array();
             
             $validator = Validator::make($data,$validateionRules,array(),$attributes);
             if ($validator->fails())
             { 
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Validation Error', 'errors' => $validator->errors()));
-            } 
-            $id = $request->product_id;
+            }
+            $id = $request->id;
             $customerId = $request->customer_id;
-            $checkData = PosProductWishlist::where('product_id',$id)->where('user_id',$customerId)->first();
+            $checkData = PosProductWishlist::where('id',$id)->where('user_id',$customerId)->first();
             if(empty($checkData))
             {
                 return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Error', 'errors' =>'This ID does not exist!'));
             }
-            PosProductWishlist::where('product_id',$id)->where('user_id',$customerId)->delete();
-            return array('httpStatus'=>201, 'dateTime'=>time(), 'status'=>'success','message' => 'This Product remove from your wishlist successfully!');
+            PosProductWishlist::where('id',$id)->where('user_id',$customerId)->delete();
+            return array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'success','message' => 'This Product remove from your wishlist successfully!');
         } catch (\Throwable $th) {
             return response()->json(['status' => 'fail', 'error_message' => $th->getMessage()], 400);
         }
@@ -1941,58 +2019,122 @@ class PosApiController extends Controller
     // testing shiprocket 
     public function customer_ship_rocket(Request $request)
     {
-        // $orderDetails = [
-        //     "order_id"=> "224-44491",
-        //     "order_date"=> "2022-11-26 11:11",
-        //     "pickup_location"=> "hq",
-        //     "channel_id"=> "",
-        //     "comment"=> "sdsd",
-        //     "billing_customer_name"=> "CUSTOMER 1",
-        //     "billing_last_name"=> "CUSTOMER LASTNAME",
-        //     "billing_address"=> "House 221B, Leaf Village",
-        //     "billing_address_2"=> "Near Hokage House",
-        //     "billing_city"=> "New Delhi",
-        //     "billing_pincode"=> "201002",
-        //     "billing_state"=> "Delhi",
-        //     "billing_country"=> "India",
-        //     "billing_email"=> "kiaasa.pr@gmail.com",
-        //     "billing_phone"=> "9897753786",
-        //     "shipping_is_billing"=> true,
-        //     "shipping_customer_name"=> "",
-        //     "shipping_last_name"=> "",
-        //     "shipping_address"=> "",
-        //     "shipping_address_2"=> "",
-        //     "shipping_city"=> "",
-        //     "shipping_pincode"=> "",
-        //     "shipping_country"=> "",
-        //     "shipping_state"=> "",
-        //     "shipping_email"=> "",
-        //     "shipping_phone"=> "",
-        //     "order_items"=> "2",
-        //         "name"=> "COD",
-        //         "sku"=> "Tshirt-Blue-32",
-        //         "units"=> 1,
-        //         "selling_price"=> "1139.80",
-        //         "discount"=> "",
-        //         "tax"=> "",
-        //         "hsn"=> 4435,
-        //     "payment_method"=> "Prepaid",
-        //     "shipping_charges"=> 0,
-        //     "giftwrap_charges"=>0,
-        //     "transaction_charges"=> 0,
-        //     "total_discount"=> 0,
-        //     "sub_total"=> 1139.80,
-        //     "length"=> 10,
-        //     "breadth"=> 15,
-        //     "height"=> 20,
-        //     "weight"=> 2.5,
-        // ];
+        $orderDetails = [
+            "order_id"=> "224-44491",
+            "order_date"=> "2022-11-26 11:11",
+            "pickup_location"=> "hq",
+            "channel_id"=> "",
+            "comment"=> "sdsd",
+            "billing_customer_name"=> "CUSTOMER 1",
+            "billing_last_name"=> "CUSTOMER LASTNAME",
+            "billing_address"=> "House 221B, Leaf Village",
+            "billing_address_2"=> "Near Hokage House",
+            "billing_city"=> "New Delhi",
+            "billing_pincode"=> "201002",
+            "billing_state"=> "Delhi",
+            "billing_country"=> "India",
+            "billing_email"=> "kiaasa.pr@gmail.com",
+            "billing_phone"=> "9897753786",
+            "shipping_is_billing"=> true,
+            "shipping_customer_name"=> "",
+            "shipping_last_name"=> "",
+            "shipping_address"=> "",
+            "shipping_address_2"=> "",
+            "shipping_city"=> "",
+            "shipping_pincode"=> "",
+            "shipping_country"=> "",
+            "shipping_state"=> "",
+            "shipping_email"=> "",
+            "shipping_phone"=> "",
+            "order_items"=> "2",
+                "name"=> "COD",
+                "sku"=> "Tshirt-Blue-32",
+                "units"=> 1,
+                "selling_price"=> "1139.80",
+                "discount"=> "",
+                "tax"=> "",
+                "hsn"=> 4435,
+            "payment_method"=> "Prepaid",
+            "shipping_charges"=> 0,
+            "giftwrap_charges"=>0,
+            "transaction_charges"=> 0,
+            "total_discount"=> 0,
+            "sub_total"=> 1139.80,
+            "length"=> 10,
+            "breadth"=> 15,
+            "height"=> 20,
+            "weight"=> 2.5,
+        ];
 
-        // $token = Shiprocket::getToken();
+        $token = Shiprocket::getToken();
         
-        // $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjczNTA2OTUxLCJleHAiOjE2NzQzNzA5NTEsIm5iZiI6MTY3MzUwNjk1MSwianRpIjoiQjhrVFRQZ2ZldUNKVWFGUiJ9.omNB9GB6woLjX8wttamhOTzHy_OUEaPRaDHoXfOGmp8';
-        // $response =  Shiprocket::order($token)->create($orderDetails);
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjczNTA2OTUxLCJleHAiOjE2NzQzNzA5NTEsIm5iZiI6MTY3MzUwNjk1MSwianRpIjoiQjhrVFRQZ2ZldUNKVWFGUiJ9.omNB9GB6woLjX8wttamhOTzHy_OUEaPRaDHoXfOGmp8';
+        $response =  Shiprocket::order($token)->create($orderDetails);
 
-        // return $response;
+        return $response;
     }
+
+
+    // Create customer billing address
+    public function createPosCustomerBillingAddress(Request $request){
+        try{ 
+            $data = $request->all();
+            $content_type_header = $request->header('Content-Type');
+            if(empty($content_type_header) || strtolower($content_type_header) != 'application/json' ){
+                return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
+            }
+
+            if($data['billing_address_type'] == "Same as Shipping Address")
+            {  
+                $customer_data = Pos_customer_address::where('customer_id',trim($data['customer_id']))->where('is_deleted',0)->first();
+                if(empty($customer_data)){
+                    return response(array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'fail', 'message'=>'Customer with ID: '.$data['customer_id'].' does not exists', 'errors' => 'Customer with ID: '.$data['customer_id'].' does not exists'));
+                }
+                $address_params = array('customer_id'=>trim($data['customer_id']),'order_type'=>trim($data['order_type']),'payment_method'=>trim($data['payment_method']),'bill_cust_name'=>trim($customer_data['full_name']),'bill_address'=>trim($customer_data['address']),'bill_locality'=>trim($customer_data['locality']),'bill_city_name'=>trim($customer_data['city_name']),'bill_postal_code'=>trim($customer_data['postal_code']),'bill_state_id'=>trim($customer_data['state_id']),'bill_phone'=>$customer_data['phone']);
+                $address_params['is_deleted'] = 0;
+                $address_params['bill_data_same'] = 1;
+                $billing_address = Pos_Customer_Orders::insert($address_params);
+                return response(array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'success','message' => 'customer billing address is same as shipping address.','address'=>$address_params),200);
+            }else{
+                $validationRules = array('full_name'=>'Required|min:3|max:200','customer_id'=>'Required|integer','address'=>'Required|min:10|max:200','locality'=>'Required|min:2|max:200',
+                'city_name'=>'Required|min:3|max:200','postal_code'=>'Required|min:5|max:15','state_id'=>'Required|integer','phone_no'=> 'required|numeric|digits_between:10,12');
+                $attributes = array('state_id'=>'State');
+                
+                $validator = Validator::make($data,$validationRules,array(),$attributes);
+                if ($validator->fails()){ 
+                    return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Validation Error', 'errors' => $validator->errors()));
+                } 
+                $address_params = array('customer_id'=>trim($data['customer_id']),'order_type'=>trim($data['order_type']),'payment_method'=>trim($data['payment_method']),'bill_cust_name'=>trim($data['full_name']),'bill_address'=>trim($data['address']),'bill_locality'=>trim($data['locality']),'bill_city_name'=>trim($data['city_name']),'bill_postal_code'=>trim($data['postal_code']),'bill_state_id'=>trim($data['state_id']),'bill_phone'=>$data['phone_no']);
+                $address_params['is_deleted'] = 0;
+                $address_params['bill_data_same'] = 0;
+                $billing_address = Pos_Customer_Orders::insert($address_params);
+                return response(array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'success','message' => 'customer billing address is saved succesfully!.','address'=>$address_params),200);
+            }
+            
+            return response(array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'success','message' => 'customer billing address added successfully','address'=>$address_params),200);
+           
+        }catch (\Exception $e){
+            CommonHelper::saveException($e,'STORE',__FUNCTION__,__FILE__);
+            return response(array('httpStatus'=>200,"dateTime"=>time(),'status' => 'fail','error_message'=>$e->getMessage(),'message'=>'Error in Processing Request'),200);
+        }    
+    }
+
+    // To get all cities and postalcode
+    public function getCitiesPostalcode(Request $request,$id)
+    {
+        try {
+                   $data = $request->all();
+                   $content_type_header = $request->header('Content-Type');
+                   if(empty($content_type_header) || strtolower($content_type_header) != 'application/json' ){
+                   return response(array('httpStatus'=>200, "dateTime"=>time(), 'status'=>'fail', 'message'=>'Invalid Content-Type Header', 'errors' => 'Invalid Content-Type Header'),200);
+                   }
+                    $cities= Pos_customer_address::where('state_id',$id)->get(['city_name','postal_code']);
+                   return response(array('httpStatus'=>200, 'dateTime'=>time(), 'status'=>'success','message' => 'Cities & Postal Code','data'=>$cities),200);
+                  
+            } catch (Exception $e) {
+                    CommonHelper::saveException($e,'STORE',__FUNCTION__,__FILE__);
+                    return response(array('httpStatus'=>200,"dateTime"=>time(),'status' => 'fail','error_message'=>$e->getMessage(),'message'=>'Error in Processing Request'),200);
+                    
+            }
+       }
 }
