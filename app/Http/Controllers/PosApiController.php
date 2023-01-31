@@ -1024,7 +1024,7 @@ class PosApiController extends Controller
             }
         
             // $validateionRules = array('phone_no'=>'Required|digits_between:10,12','email'=>'Required|email|max:200','salutation'=>'Required','name'=>'Required|max:200','password'=>'Required|min:8|max:50|regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$');
-            $validateionRules = array('phone_no'=>'Required|digits_between:10,12','email'=>'Required|email|max:200','name'=>'Required|max:200','password'=>'Required|min:8|max:50');
+            $validateionRules = array('phone_no'=>'Required|numeric|digits_between:10,12','email'=>'Required|email|max:200','name'=>'Required|max:200','password'=>'Required|min:8|max:50');
             $attributes = array();
             
             $validator = Validator::make($data,$validateionRules,array(),$attributes);
@@ -1643,13 +1643,21 @@ class PosApiController extends Controller
                 } else {
                     PosCustomerResetPassword::create($insertArray);
                 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 77dbbcbe91b4ed7ed3cca9663ff09065ab84c3a4
                 $otp = random_int(1000, 9999);
                 $text = 'Dear Customer, Forgot your password We have received a request to reset the password for your KIAASA account. OTP to reset password is '.$otp.''; 
                 $checkPhone = PosCustomerTempOtp ::where('phone',$pos_customer_info->phone)->first();
                 
                 if($checkPhone)
                 {
+<<<<<<< HEAD
                     PosCustomerTempOtp::where('phone',$pos_customer_info->phone)->update([
+=======
+                    PosCustomerTempOtp::where('email',$request->email)->update([
+>>>>>>> 77dbbcbe91b4ed7ed3cca9663ff09065ab84c3a4
                         'phone' => $pos_customer_info->phone,
                         'otp' => $otp
                     ]);
@@ -1666,6 +1674,7 @@ class PosApiController extends Controller
                 ];
                 \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($details)); 
                 $response_data = CommonHelper::dynamic_otp_send($pos_customer_info->phone,$text);
+                // \Mail::to($request->email)->send(new \App\Mail\ForgetPasswordMail($token)); 
                 return response()->json(['httpStatus'=>200, 'dateTime'=>time(),'status' => 'success', 'message' => 'We have e-mailed your password reset link!']);
 
             }catch (\Exception $th) { 
@@ -1795,6 +1804,7 @@ class PosApiController extends Controller
                                         'pos_product_master.sale_price',
                                         'pos_product_images.image_name',
                                         'pos_product_images.image_type',
+                                        'pos_product_wishlist.store_id'
                                         )
                                     ->get(); 
 
@@ -2019,6 +2029,14 @@ class PosApiController extends Controller
     // testing shiprocket 
     public function customer_ship_rocket(Request $request)
     {
+<<<<<<< HEAD
+=======
+        // return $loginDetails =  Shiprocket::login([
+        //     'email' => 'chandan.sharma@kindlebit.com', 
+        //     'password' => 'Welcome2kb'
+        // ]);
+
+>>>>>>> 77dbbcbe91b4ed7ed3cca9663ff09065ab84c3a4
         $orderDetails = [
             "order_id"=> "224-44491",
             "order_date"=> "2022-11-26 11:11",
@@ -2068,6 +2086,7 @@ class PosApiController extends Controller
 
         $token = Shiprocket::getToken();
         
+<<<<<<< HEAD
         $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjczNTA2OTUxLCJleHAiOjE2NzQzNzA5NTEsIm5iZiI6MTY3MzUwNjk1MSwianRpIjoiQjhrVFRQZ2ZldUNKVWFGUiJ9.omNB9GB6woLjX8wttamhOTzHy_OUEaPRaDHoXfOGmp8';
         $response =  Shiprocket::order($token)->create($orderDetails);
 
@@ -2117,6 +2136,13 @@ class PosApiController extends Controller
             CommonHelper::saveException($e,'STORE',__FUNCTION__,__FILE__);
             return response(array('httpStatus'=>200,"dateTime"=>time(),'status' => 'fail','error_message'=>$e->getMessage(),'message'=>'Error in Processing Request'),200);
         }    
+=======
+        // $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE0NTQwODUsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjc0NjMwMTgwLCJleHAiOjE2NzU0OTQxODAsIm5iZiI6MTY3NDYzMDE4MCwianRpIjoibTRESVFYOVdQdEVDVE5TWiJ9.1ZXa3Bau0FXwMlrNe-i7MUy70VyWdQ0s3cbq3AlR8_0';
+        $token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMyMjc5NTgsImlzcyI6Imh0dHBzOi8vYXBpdjIuc2hpcHJvY2tldC5pbi92MS9leHRlcm5hbC9hdXRoL2xvZ2luIiwiaWF0IjoxNjc0NjMxMTk5LCJleHAiOjE2NzU0OTUxOTksIm5iZiI6MTY3NDYzMTE5OSwianRpIjoiM2NnajBTaUltN2RxZVRJcyJ9.aWBmhpB3CE7dPYt4ySH4EyksKuK0iz92WkOyQkoGp_k';
+        $response =  Shiprocket::order($token)->create($orderDetails);
+
+        return $response;
+>>>>>>> 77dbbcbe91b4ed7ed3cca9663ff09065ab84c3a4
     }
 
     // To get all cities and postalcode

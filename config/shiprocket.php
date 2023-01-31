@@ -11,8 +11,8 @@ return [
     */
 
     'credentials' => [
-        'email' => env('SHIPROCKET_EMAIL', 'youemail@email.com'),
-        'password' => env('SHIPROCKET_PASSWORD', 'secret'),
+        'email' => env('SHIPROCKET_EMAIL', 'kiaasa.pr@gmail.com'),
+        'password' => env('SHIPROCKET_PASSWORD', 'IMP@rugs10'),
     ],
 
 
